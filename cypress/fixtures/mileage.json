@@ -1,0 +1,15 @@
+{
+  "mileage": {
+    "km_inicial": "1000",
+    "km_final": "1200",
+    "qtd": "20000"
+  },
+  "cost": {
+    "consumo_medio": "10",
+    "preco_combustivel": "7500",
+    "combustivel": "gasolina"
+  },
+  "messages": {
+    "error": "Preencha todos os campos"
+  }
+}
