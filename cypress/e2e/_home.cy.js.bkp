@@ -1,12 +1,16 @@
-const domains = require('../fixtures/domains.json');
+const domains = [
+  "http://localhost/qtocusta.com.br/",
+  "http://localhost/custo.app.br/",
+  "http://localhost/custo.app/"
+];
 
 describe('home', () => {
 
   domains.forEach((domain) => {
 
-    context(domain, () => {
+    describe(domain, () => {
 
-      it('Valida alteração do idioma', () => {
+      it('lang bar', () => {
         cy.visit(domain);
         cy.get('#consent-toast');
         cy.get('#accept-consent').click();
@@ -28,7 +32,7 @@ describe('home', () => {
 
       });
 
-      it('Valida existência dos cards', () => {
+      it('cards', () => {
         cy.visit(domain);
         /* ==== Generated with Cypress Studio ==== */
         cy.get('#consent-toast')

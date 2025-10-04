@@ -1,42 +1,129 @@
-describe('home', () => {
+﻿const domains = require('../fixtures/car.json');
 
-	it('lang bar', () => {
-	cy.visit('http://localhost/qtocusta.com.br/');
+describe('Teste da tela de Consumo Médio e Custo por Km', () => {
 
-	cy.get('#consent-toast');
-	cy.get('#accept-consent').click();
+  let data;
 
-	cy.get('[aria-label="Home"]').click();
+  domains.forEach((domain) => {
 
-	const translations = {
-		pt: 'Custa? | Utilitários Para Cálculos',
-		en: 'How Much? | Calculation Tools',
-		es: '¿Cuánto Cuesta? | Herramientas De Cálculo',
-		de: 'Was Kostet’s? | Rechentools',
-		sv: 'Vad Kostar? | Kalkylverktyg',
-		ja: 'いくら？｜計算ツール'
-	};
+    describe(domain, () => {
 
-	Object.entries(translations).forEach(([lang, text]) => {
-			cy.get(`[onclick="applyTranslations('${lang}')"]`).click();
-			cy.get('.topo-conteudo > h1').contains(text, { matchCase: false });
-		});
+      beforeEach(() => {
+        cy.visit(domain);
+        cy.fixture('mileage').then((json) => {
+          data = json;
+        });
+      });
 
-	});
+      context('Formulário de Consumo Médio', () => {
 
-	it('cards', () => {
-		cy.visit('http://localhost/qtocusta.com.br/')
-		/* ==== Generated with Cypress Studio ==== */
-		cy.get('#consent-toast')
-		cy.get('#accept-consent').click()
-		/* ==== End Cypress Studio ==== */
-		/* ==== Generated with Cypress Studio ==== */
-		cy.get(':nth-child(2) > h1').click();
-		cy.get(':nth-child(3) > h1').click();
-		cy.get(':nth-child(4) > h1').click();
-		cy.get(':nth-child(5) > h1').click();
-		cy.get(':nth-child(6) > h1').click();
-		/* ==== End Cypress Studio ==== */
-	})
+        it('Deve preencher e calcular consumo médio corretamente', () => {
+          cy.get('#km_inicial')
+            .click()
+            .type(data.mileage.km_inicial);
+          cy.get('#km_final')
+            .click()
+            .type(data.mileage.km_final);
+          cy.get('#qtd')
+            .click()
+            .type(data.mileage.qtd);
 
-})
+          cy.get('#btn-media').click();
+
+          cy.get('#resultado-media')
+            .should('be.visible')
+            .and('contain.text', data.cost.consumo_medio); // km/l = (1200-1000)/20 = 10
+
+          cy.get('#historico-media')
+            .should('be.visible')
+            .and('contain.text', data.cost.consumo_medio); // km/l = (1200-1000)/20 = 10
+
+        });
+
+        it('Deve limpar o formulário ao clicar em reset', () => {
+          cy.get('#km_inicial')
+            .click()
+            .type(data.mileage.km_inicial);
+          cy.get('#km_final')
+            .click()
+            .type(data.mileage.km_final);
+          cy.get('#qtd')
+            .click()
+            .type(data.mileage.qtd);
+
+          cy.get('form#calc_mileage button[type="reset"]').click();
+
+          cy.get('#km_inicial').should('have.value', '');
+          cy.get('#km_final').should('have.value', '');
+          cy.get('#qtd').should('have.value', '');
+          cy.get('#resultado-media').should('not.be.visible');
+        });
+
+      });
+
+      context('Formulário de Custo por Km', () => {
+
+        it('Deve preencher e calcular custo por km corretamente', () => {
+          cy.get('#consumo_medio')
+            .clear().
+            type(data.cost.consumo_medio*1000);
+          cy.get('#preco_combustivel')
+            .clear()
+            .type(data.cost.preco_combustivel);
+          cy.get('#combustivel')
+            .select(data.cost.combustivel);
+
+          cy.get('#btn-custo')
+            .click();
+
+          cy.get('#resultado-custo')
+            .should('be.visible')
+            .and('contain.text', '0,75'); // Custo por km = 7,500 / 10
+
+          cy.get('#historico-media')
+            .should('be.visible')
+            .and('contain.text', '10'); // km/l = (1200-1000)/20 = 10
+
+        });
+
+        it('Deve limpar o formulário ao clicar em reset', () => {
+          cy.get('#consumo_medio')
+            .clear().
+            type(data.cost.consumo_medio * 1000);
+          cy.get('#preco_combustivel')
+            .clear()
+            .type(data.cost.preco_combustivel);
+          cy.get('#combustivel')
+            .select(data.cost.combustivel);
+
+          cy.get('form#calc_cost button[type="reset"]')
+            .click();
+
+          cy.get('#consumo_medio')
+            .should('have.value', '');
+          cy.get('#preco_combustivel')
+            .should('have.value', '');
+          cy.get('#combustivel')
+            .should('have.value', null);
+          cy.get('#resultado-custo')
+            .should('not.be.visible');
+        });
+
+      });
+
+      context('Verificações gerais', () => {
+
+        it('Deve exibir vídeo do YouTube se não for Android', () => {
+          cy.get('body').then(($body) => {
+            if (!$body.find('#historico-media').length) {
+              cy.get('iframe').should('have.attr', 'src').and('include', 'youtube.com');
+            }
+          });
+        });
+
+      });
+    });
+
+  });
+
+});
