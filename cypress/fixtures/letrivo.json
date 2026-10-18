@@ -1,0 +1,14 @@
+{
+  "jogos": [
+    { "id": "letfall", "titulo": "Forme palavras" },
+    { "id": "letrix", "titulo": "Caça-palavras" },
+    { "id": "letmaze", "titulo": "Labirinto" },
+    { "id": "letchess", "titulo": "Xadrez" }
+  ],
+  "idiomas": [
+    { "botao": "EN", "path": "en/", "lang": "en" },
+    { "botao": "ES", "path": "es/", "lang": "es" },
+    { "botao": "PT", "path": "./", "lang": "pt-BR" }
+  ],
+  "abas": ["letfit", "letpush", "letmaze", "letrix", "letfall", "letchess"]
+}

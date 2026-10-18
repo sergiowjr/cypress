@@ -18,3 +18,8 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+// Ignora erros de scripts de terceiros (ex.: Cloudflare Turnstile)
+Cypress.on('uncaught:exception', (err) => {
+  if (/turnstile|challenges\.cloudflare|Script error/i.test(err.message)) return false;
+});
